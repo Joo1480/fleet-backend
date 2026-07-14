@@ -1,14 +1,15 @@
 import express from "express";
-import cors from "cors";
 
-export function createApp(){
-    const app = express();
+import routes from "./routes";
+import { errorHandler } from "./shared/middleware/error-handler";
 
-    app.use(cors());
-    app.use(express.json());
+const app = express();
 
-    app.get("/health", (_, res) => {
-        res.json({status : "ok"})
-    })
-    return app;
-}
+app.use(express.json());
+
+app.use(routes);
+
+// Deve ser o último middleware
+app.use(errorHandler);
+
+export default app;
