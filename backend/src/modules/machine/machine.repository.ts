@@ -1,39 +1,53 @@
-import { prisma } from "../../shared/prisma/client";
 import { Prisma } from "@prisma/client";
 
-import { MachineFilters } from "./machine.types";
+import { prisma } from "../../shared/prisma/client";
 
-export async function findMachines(
-  filters: MachineFilters,
-) {
+import type { ListMachinesSchema } from "./machine.schema";
+
+export async function findMachines(filters: ListMachinesSchema) {
+  const { search, type, page, pageSize } = filters;
+
   const where: Prisma.MachineWhereInput = {
     deletedAt: null,
   };
 
-  if (filters.search) {
+  if (search) {
     where.OR = [
       {
         name: {
-          contains: filters.search,
+          contains: search,
           mode: "insensitive",
         },
       },
       {
         code: {
-          contains: filters.search,
+          contains: search,
         },
       },
     ];
   }
 
-  if (filters.type) {
-    where.type = filters.type;
+  if (type) {
+    where.type = type;
   }
 
-  return prisma.machine.findMany({
-    where,
-    orderBy: {
-      name: "asc",
-    },
-  });
+  const [machines, total] = await prisma.$transaction([
+    prisma.machine.findMany({
+      where,
+      orderBy: {
+        name: "asc",
+      },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+
+    prisma.machine.count({
+      where,
+    }),
+  ]);
+
+  return {
+    machines,
+    total,
+  };
 }

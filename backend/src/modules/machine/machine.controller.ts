@@ -11,7 +11,5 @@ export async function listMachines(
 
   const machines = await getMachines(filters);
 
-  return response.json({
-    data: machines,
-  });
+  return response.json({ machines });
 }
