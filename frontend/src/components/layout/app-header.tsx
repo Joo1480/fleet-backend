@@ -7,21 +7,19 @@ export function AppHeader() {
   const pathname = usePathname();
 
   return (
-    <header className="border-b bg-white">
-      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-6">
-
-        <div className="font-bold">
-          🚜 Analitica <span className="font-normal">Frota</span>
+    <header className="sticky top-0 z-10 h-14 border-b border-[var(--border)] bg-[var(--surface)]">
+      <div className="mx-auto flex h-full max-w-[1120px] items-center gap-6 px-6">
+        <div className="text-[15px] font-bold tracking-[-0.01em] whitespace-nowrap">
+          🚜 Analitica <span className="font-normal text-[var(--muted)]">· Frota</span>
         </div>
 
-        <nav className="flex gap-2">
-
+        <nav className="flex gap-1">
           <Link
             href="/dashboard"
-            className={`rounded-md px-3 py-2 text-sm transition ${
+            className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
               pathname === "/dashboard"
-                ? "bg-gray-200"
-                : "hover:bg-gray-100"
+                ? "bg-black/5 text-[var(--ink)]"
+                : "text-[var(--ink-2)] hover:bg-black/5"
             }`}
           >
             Dashboard
@@ -29,17 +27,15 @@ export function AppHeader() {
 
           <Link
             href="/machines"
-            className={`rounded-md px-3 py-2 text-sm transition ${
+            className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
               pathname === "/machines"
-                ? "bg-gray-200"
-                : "hover:bg-gray-100"
+                ? "bg-black/5 text-[var(--ink)]"
+                : "text-[var(--ink-2)] hover:bg-black/5"
             }`}
           >
             Máquinas
           </Link>
-
         </nav>
-
       </div>
     </header>
   );
