@@ -9,7 +9,8 @@
     "start": "node dist/server.js",
     "test": "vitest",
     "test:coverage": "vitest --coverage",
-    "db:seed": "prisma db seed"
+    "db:seed": "prisma db seed",
+    "docker": "prisma migrate deploy && prisma db seed && npm run dev"
   },
 
   "prisma": {
