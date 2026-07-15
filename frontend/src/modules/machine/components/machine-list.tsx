@@ -8,10 +8,12 @@ import { MachinePagination } from "./machine-pagination";
 
 export function MachineList() {
     const [page, setPage] = useState(1);
+    const [type, setType] = useState("");
 
     const { data, isPending, error } = useMachines({
         page,
         pageSize: 10,
+        type,
     });
 
   if (isPending) {
@@ -33,7 +35,13 @@ export function MachineList() {
       </div>
 
       <div className="overflow-hidden rounded-xl border border-[var(--border)] bg-white">
-        <MachineToolbar />
+        <MachineToolbar
+            type={type}
+            onTypeChange={(value) => {
+                setPage(1);
+                setType(value);
+            }}
+        />
 
         <MachineTable machines={data.data} />
         <MachinePagination
