@@ -1,23 +1,48 @@
 "use client";
 
+import { useMachines } from "../hooks/use-machines";
 import { MachineTable } from "./machine-table";
 import { MachineToolbar } from "./machine-toolbar";
+import { useState } from "react";
+import { MachinePagination } from "./machine-pagination";
 
 export function MachineList() {
+    const [page, setPage] = useState(1);
+
+    const { data, isPending, error } = useMachines({
+        page,
+        pageSize: 10,
+    });
+
+  if (isPending) {
+    return <p>Carregando...</p>;
+  }
+
+  if (error || !data) {
+    return <p>Erro ao carregar máquinas.</p>;
+  }
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Máquinas</h1>
 
         <p className="mt-1 text-sm text-[var(--muted)]">
-          Gerencie sua frota de máquinas
+          Gerencie sua frota • {data.pagination.total} máquinas
         </p>
       </div>
 
       <div className="overflow-hidden rounded-xl border border-[var(--border)] bg-white">
         <MachineToolbar />
 
-        <MachineTable />
+        <MachineTable machines={data.data} />
+        <MachinePagination
+            page={page}
+            pageSize={data.pagination.pageSize}
+            total={data.pagination.total}
+            onPageChange={setPage}
+        />
+
       </div>
     </div>
   );
