@@ -12,5 +12,5 @@ export async function listMachines(
     params: filters,
   });
 
-  return data;
+  return data.machines;
 }
