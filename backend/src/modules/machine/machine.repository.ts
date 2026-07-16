@@ -2,7 +2,11 @@ import { Prisma } from "@prisma/client";
 
 import { prisma } from "../../shared/prisma/client";
 
-import type { ListMachinesSchema } from "./machine.schema";
+import type {
+  CreateMachineSchema,
+  ListMachinesSchema,
+} from "./machine.schema";
+
 
 export async function findMachines(filters: ListMachinesSchema) {
   const { search, type, page, pageSize } = filters;
@@ -50,4 +54,19 @@ export async function findMachines(filters: ListMachinesSchema) {
     machines,
     total,
   };
+}
+
+export async function createMachine(
+  machine: CreateMachineSchema,
+) {
+  return prisma.machine.create({
+    data: {
+      code: machine.code,
+      name: machine.name,
+      type: machine.type,
+      model: machine.model,
+      brand: machine.brand,
+      year: machine.year,
+    },
+  });
 }
