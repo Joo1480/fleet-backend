@@ -13,18 +13,16 @@ export async function seedEvents() {
 
   const machines = await prisma.machine.findMany({
     select: {
-      id: true,
       code: true,
     },
   });
 
-  const machineMap = new Map(
-    machines.map((machine) => [machine.code, machine.id]),
+  const machineCodes = new Set(
+    machines.map((machine) => machine.code),
   );
 
   const eventData = eventList
     .map((event) => {
-      const machineId = machineMap.get(event.machineCode);
       const eventGroup = EVENT_GROUP_MAP[event.eventGroup];
 
       const startTime = new Date(event.startTime);
@@ -32,7 +30,7 @@ export async function seedEvents() {
         ? new Date(event.endTime)
         : null;
 
-      if (!machineId) {
+      if (!machineCodes.has(event.machineCode)) {
         console.warn(
           `Skipping event ${event.id}: machine ${event.machineCode} not found.`,
         );
@@ -54,7 +52,8 @@ export async function seedEvents() {
       }
 
       return {
-        machineId,
+        id: event.id,
+        machineCode : event.machineCode,
         eventGroup,
         startTime,
         endTime,

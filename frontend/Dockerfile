@@ -8,9 +8,7 @@ RUN npm install
 
 COPY . .
 
-RUN npx prisma generate
-
-ENV CHOKIDAR_USEPOLLING=true
+ENV WATCHPACK_POLLING=true
 
 EXPOSE 3000
 

@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   postgres:
-    image: postgres:16
+    image: postgres:16-alpine
     container_name: fleet-postgres
     restart: unless-stopped
 
@@ -17,22 +17,42 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d fleet_monitor"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
   backend:
     build:
       context: ./backend
 
     container_name: fleet-backend
 
-    restart: unless-stopped
+    working_dir: /app
+
+    command: sh -c "npx prisma generate && npx prisma migrate deploy && npx prisma db seed && npm run dev"
+
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
 
     ports:
       - "3000:3000"
 
     environment:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/fleet_monitor
+      PORT: 3000
+      CORS_ORIGIN: http://localhost:3001
+      CHOKIDAR_USEPOLLING: "true"
 
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+
+    stdin_open: true
+    tty: true
 
   frontend:
     build:
@@ -40,13 +60,20 @@ services:
 
     container_name: fleet-frontend
 
-    restart: unless-stopped
+    working_dir: /app
+
+    command: npm run dev
+
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
 
     ports:
       - "3001:3000"
 
     environment:
       NEXT_PUBLIC_API_URL: http://localhost:3000
+      WATCHPACK_POLLING: "true"
 
     depends_on:
       - backend
