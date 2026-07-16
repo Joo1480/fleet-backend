@@ -4,7 +4,11 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { createMachine } from "../services/machine.service";
 
-export function useCreateMachine() {
+type UseCreateMachineOptions = {
+  onSuccess?: () => void;
+};
+
+export function useCreateMachine(options?: UseCreateMachineOptions) {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -14,6 +18,8 @@ export function useCreateMachine() {
       queryClient.invalidateQueries({
         queryKey: ["machines"],
       });
+
+      options?.onSuccess?.();
     },
   });
 }

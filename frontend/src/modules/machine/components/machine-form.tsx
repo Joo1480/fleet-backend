@@ -7,24 +7,34 @@ import { MACHINE_TYPES } from "../utils/machine-type";
 import {
   createMachineSchema,
   CreateMachineFormData,
+
 } from "../schemas/machine.schema";
+
+import { useCreateMachine } from "../hooks/use-create-machine";
 
 type MachineFormProps = {
   onCancel: () => void;
 };
 
 export function MachineForm({ onCancel }: MachineFormProps) {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<CreateMachineFormData>({
-    resolver: zodResolver(createMachineSchema),
-  });
+    const {
+        register,
+        handleSubmit,
+        reset,
+        formState: { errors },
+        } = useForm<CreateMachineFormData>({
+        resolver: zodResolver(createMachineSchema),
+    });
+   const createMachine = useCreateMachine({
+        onSuccess: () => {
+            reset();
+            onCancel();
+        },
+    });
 
-  const onSubmit = (data: CreateMachineFormData) => {
-    console.log(data);
-  };
+    const onSubmit = (data: CreateMachineFormData) => {
+        createMachine.mutate(data);
+    };
 
   return (
     <form
@@ -181,10 +191,11 @@ export function MachineForm({ onCancel }: MachineFormProps) {
         </button>
 
         <button
-          type="submit"
-          className="rounded-lg bg-black px-5 py-2 text-white"
+        type="submit"
+        disabled={createMachine.isPending}
+        className="rounded-lg bg-black px-5 py-2 text-white disabled:cursor-not-allowed disabled:opacity-50"
         >
-          Salvar
+        {createMachine.isPending ? "Salvando..." : "Salvar"}
         </button>
       </div>
     </form>
