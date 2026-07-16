@@ -5,11 +5,13 @@ import { MachineTable } from "./machine-table";
 import { MachineToolbar } from "./machine-toolbar";
 import { useState } from "react";
 import { MachinePagination } from "./machine-pagination";
+import { MachineModal } from "./machine-modal";
 
 export function MachineList() {
     const [page, setPage] = useState(1);
     const [type, setType] = useState("");
     const [search, setSearch] = useState("");
+    const [openModal, setOpenModal] = useState(false);
 
     const { data, isPending, error } = useMachines({
         page,
@@ -48,9 +50,15 @@ export function MachineList() {
             setPage(1);
             setType(value);
           }}
+          onCreate={() => setOpenModal(true)}
         />
 
         <MachineTable machines={data.data} />
+        <MachineModal
+          open={openModal}
+          onClose={() => setOpenModal(false)}
+        />
+        
         <MachinePagination
             page={page}
             pageSize={data.pagination.pageSize}

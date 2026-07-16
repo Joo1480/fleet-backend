@@ -8,6 +8,8 @@ export type Machine = {
   year: number;
 };
 
+export type CreateMachine = Omit<Machine, "id">;
+
 export type Pagination = {
   page: number;
   pageSize: number;
