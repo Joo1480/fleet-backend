@@ -9,103 +9,98 @@ type MachineFormProps = {
 export function MachineForm({ onCancel }: MachineFormProps) {
   return (
     <form className="space-y-5">
-      {/* Código */}
-      <div className="flex flex-col gap-2">
-        <label className="text-sm font-semibold">
-          Código <span className="text-red-500">*</span>
+      <div>
+        <label className="mb-2 block text-sm font-medium">
+          Código *
         </label>
 
         <input
           type="text"
-          className="h-12 rounded-xl border border-gray-300 px-4 outline-none transition focus:border-black"
+          className="h-11 w-full rounded-lg border border-gray-300 px-3"
         />
       </div>
 
-      {/* Nome */}
-      <div className="flex flex-col gap-2">
-        <label className="text-sm font-semibold">
-          Nome <span className="text-red-500">*</span>
+      <div>
+        <label className="mb-2 block text-sm font-medium">
+          Nome *
         </label>
 
         <input
           type="text"
           placeholder="Ex.: Colhedora 6005"
-          className="h-12 rounded-xl border border-gray-300 px-4 outline-none transition focus:border-black"
+          className="h-11 w-full rounded-lg border border-gray-300 px-3"
         />
       </div>
 
-      {/* Tipo / Ano */}
       <div className="grid grid-cols-2 gap-4">
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-semibold">
-            Tipo <span className="text-red-500">*</span>
+        <div>
+          <label className="mb-2 block text-sm font-medium">
+            Tipo *
           </label>
 
-          <select className="h-12 rounded-xl border border-gray-300 px-4 outline-none">
-            {MACHINE_TYPES.map((machineType) => (
+          <select className="h-11 w-full rounded-lg border border-gray-300 px-3">
+            {MACHINE_TYPES.map((type) => (
               <option
-                key={machineType.value}
-                value={machineType.value}
+                key={type.value}
+                value={type.value}
               >
-                {machineType.label}
+                {type.label}
               </option>
             ))}
           </select>
         </div>
 
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-semibold">
-            Ano <span className="text-red-500">*</span>
+        <div>
+          <label className="mb-2 block text-sm font-medium">
+            Ano *
           </label>
 
           <input
             type="number"
             placeholder="2024"
-            className="h-12 rounded-xl border border-gray-300 px-4 outline-none transition focus:border-black"
+            className="h-11 w-full rounded-lg border border-gray-300 px-3"
           />
         </div>
       </div>
 
-      {/* Modelo / Marca */}
       <div className="grid grid-cols-2 gap-4">
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-semibold">
-            Modelo <span className="text-red-500">*</span>
+        <div>
+          <label className="mb-2 block text-sm font-medium">
+            Modelo *
           </label>
 
           <input
             type="text"
             placeholder="Ex.: CH570"
-            className="h-12 rounded-xl border border-gray-300 px-4 outline-none transition focus:border-black"
+            className="h-11 w-full rounded-lg border border-gray-300 px-3"
           />
         </div>
 
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-semibold">
-            Marca <span className="text-red-500">*</span>
+        <div>
+          <label className="mb-2 block text-sm font-medium">
+            Marca *
           </label>
 
           <input
             type="text"
             placeholder="Ex.: John Deere"
-            className="h-12 rounded-xl border border-gray-300 px-4 outline-none transition focus:border-black"
+            className="h-11 w-full rounded-lg border border-gray-300 px-3"
           />
         </div>
       </div>
 
-      {/* Botões */}
-      <div className="flex justify-end gap-3 pt-4">
+      <div className="flex justify-end gap-3 pt-2">
         <button
           type="button"
           onClick={onCancel}
-          className="rounded-xl border border-gray-300 px-6 py-3 font-medium"
+          className="rounded-lg border border-gray-300 px-5 py-2"
         >
           Cancelar
         </button>
 
         <button
           type="submit"
-          className="rounded-xl bg-black px-6 py-3 font-medium text-white"
+          className="rounded-lg bg-black px-5 py-2 text-white"
         >
           Salvar
         </button>

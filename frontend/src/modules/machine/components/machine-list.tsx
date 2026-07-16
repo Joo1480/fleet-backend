@@ -6,6 +6,7 @@ import { MachineToolbar } from "./machine-toolbar";
 import { useState } from "react";
 import { MachinePagination } from "./machine-pagination";
 import { MachineModal } from "./machine-modal";
+import { MachineForm } from "./machine-form";
 
 export function MachineList() {
     const [page, setPage] = useState(1);
@@ -56,8 +57,14 @@ export function MachineList() {
         <MachineTable machines={data.data} />
         <MachineModal
           open={openModal}
+          title="Nova máquina"
+          description="Preencha os dados da máquina. Validação espelhada no backend (Zod)."
           onClose={() => setOpenModal(false)}
-        />
+        >
+          <MachineForm
+            onCancel={() => setOpenModal(false)}
+          />
+        </MachineModal>
         
         <MachinePagination
             page={page}
