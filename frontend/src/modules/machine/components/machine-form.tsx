@@ -11,20 +11,44 @@ import {
 } from "../schemas/machine.schema";
 
 import { useCreateMachine } from "../hooks/use-create-machine";
+import { Machine } from "../types/machine";
 
 type MachineFormProps = {
   onCancel: () => void;
+  machine?: Machine;
 };
 
-export function MachineForm({ onCancel }: MachineFormProps) {
+export function MachineForm({
+  onCancel,
+  machine,
+}: MachineFormProps) {
     const {
-        register,
-        handleSubmit,
-        reset,
-        formState: { errors },
-        } = useForm<CreateMachineFormData>({
-        resolver: zodResolver(createMachineSchema),
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+    } = useForm<CreateMachineFormData>({
+    resolver: zodResolver(createMachineSchema),
+
+    defaultValues: machine
+        ? {
+            code: machine.code,
+            name: machine.name,
+            type: machine.type,
+            model: machine.model,
+            brand: machine.brand,
+            year: machine.year,
+        }
+        : {
+            code: "",
+            name: "",
+            type: "",
+            model: "",
+            brand: "",
+            year: undefined,
+        },
     });
+    
    const createMachine = useCreateMachine({
         onSuccess: () => {
             reset();
@@ -48,7 +72,7 @@ export function MachineForm({ onCancel }: MachineFormProps) {
         </label>
 
         <input
-          type="text"
+          type="number"
           {...register("code")}
           className={`h-11 w-full rounded-lg border px-3 ${
             errors.code ? "border-red-500" : "border-gray-300"

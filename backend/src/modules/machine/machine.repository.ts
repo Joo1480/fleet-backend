@@ -5,6 +5,7 @@ import { prisma } from "../../shared/prisma/client";
 import type {
   CreateMachineSchema,
   ListMachinesSchema,
+  UpdateMachineSchema,
 } from "./machine.schema";
 
 
@@ -67,6 +68,27 @@ export async function createMachine(
       model: machine.model,
       brand: machine.brand,
       year: machine.year,
+    },
+  });
+}
+
+export async function updateMachine(
+  code: string,
+  machine: UpdateMachineSchema,
+) {
+  return prisma.machine.update({
+    where: {
+      code,
+    },
+    data: {
+      name: machine.name,
+      type: machine.type,
+      model: machine.model,
+      brand: machine.brand,
+      year: machine.year,
+
+      // Só atualize o code se a regra de negócio permitir.
+      code: machine.code,
     },
   });
 }

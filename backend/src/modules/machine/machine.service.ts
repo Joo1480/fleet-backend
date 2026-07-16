@@ -1,6 +1,7 @@
 import {
   createMachine as createMachineRepository,
   findMachines,
+  updateMachine as updateMachineRepository,
 } from "./machine.repository";
 
 import { toMachineDto } from "./machine.mapper";
@@ -8,6 +9,7 @@ import { toMachineDto } from "./machine.mapper";
 import type {
   CreateMachineSchema,
   ListMachinesSchema,
+  UpdateMachineSchema,
 } from "./machine.schema";
 
 export async function getMachines(filters: ListMachinesSchema) {
@@ -30,4 +32,16 @@ export async function createMachine(
     await createMachineRepository(machine);
 
   return toMachineDto(createdMachine);
+}
+
+export async function updateMachine(
+  code: string,
+  machine: UpdateMachineSchema,
+) {
+  const updatedMachine = await updateMachineRepository(
+    code,
+    machine,
+  );
+
+  return toMachineDto(updatedMachine);
 }
