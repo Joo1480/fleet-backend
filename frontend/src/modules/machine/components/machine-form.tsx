@@ -27,6 +27,7 @@ export function MachineForm({
     register,
     handleSubmit,
     reset,
+    setError,
     formState: { errors },
     } = useForm<CreateMachineFormData>({
     resolver: zodResolver(createMachineSchema),
@@ -73,7 +74,16 @@ export function MachineForm({
         return;
       }
 
-      createMachine.mutate(data);
+      createMachine.mutate(data, {
+        onError: (error: any) => {
+          if (error.response?.status === 409) {
+            setError("code", {
+              type: "server",
+              message: error.response.data.message,
+            });
+          }
+        },
+      });
     };
 
   return (

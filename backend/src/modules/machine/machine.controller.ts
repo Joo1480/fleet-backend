@@ -30,9 +30,19 @@ export async function createMachine(
 ) {
   const machine = createMachineSchema.parse(request.body);
 
+  try {
   const createdMachine = await createMachineService(machine);
 
   return response.status(201).json(createdMachine);
+  } catch (error: any) {
+    if (error.code === "P2002") {
+      return response.status(409).json({
+        message: "Já existe uma máquina com este código.",
+      });
+    }
+
+    throw error;
+  }
 }
 
 export async function updateMachine(

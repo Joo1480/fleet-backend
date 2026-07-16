@@ -12,14 +12,14 @@ export function useCreateMachine(options?: UseCreateMachineOptions) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: createMachine,
+  mutationFn: createMachine,
 
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["machines"],
-      });
+  onSuccess: () => {
+    queryClient.invalidateQueries({
+      queryKey: ["machines"],
+    });
 
-      options?.onSuccess?.();
-    },
-  });
+    options?.onSuccess?.();
+  },
+});
 }
