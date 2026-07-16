@@ -9,14 +9,16 @@ import { MachinePagination } from "./machine-pagination";
 export function MachineList() {
     const [page, setPage] = useState(1);
     const [type, setType] = useState("");
+    const [search, setSearch] = useState("");
 
     const { data, isPending, error } = useMachines({
         page,
         pageSize: 10,
         type,
+        search
     });
 
-  if (isPending) {
+  if (isPending && !data) {
     return <p>Carregando...</p>;
   }
 
@@ -36,11 +38,16 @@ export function MachineList() {
 
       <div className="overflow-hidden rounded-xl border border-[var(--border)] bg-white">
         <MachineToolbar
-            type={type}
-            onTypeChange={(value) => {
-                setPage(1);
-                setType(value);
-            }}
+          type={type}
+          search={search}
+          onSearchChange={(value) => {
+            setPage(1);
+            setSearch(value);
+          }}
+          onTypeChange={(value) => {
+            setPage(1);
+            setType(value);
+          }}
         />
 
         <MachineTable machines={data.data} />

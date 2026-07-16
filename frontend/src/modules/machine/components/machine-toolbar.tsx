@@ -4,12 +4,16 @@ import { Search, Plus } from "lucide-react";
 import { MACHINE_TYPES } from "../utils/machine-type";
 
 type MachineToolbarProps = {
+  search: string;
   type: string;
+  onSearchChange: (value: string) => void;
   onTypeChange: (value: string) => void;
 };
 
 export function MachineToolbar({
+  search,
   type,
+  onSearchChange,
   onTypeChange,
 }: MachineToolbarProps) {
   return (
@@ -25,6 +29,8 @@ export function MachineToolbar({
           <input
             type="text"
             placeholder="Buscar máquina..."
+             value={search}
+            onChange={(e) => onSearchChange(e.target.value)}
             className="h-10 w-72 rounded-lg border border-[var(--border)] bg-white pl-10 pr-3 text-sm outline-none transition focus:border-black/20 focus:ring-2 focus:ring-black/5"
           />
         </div>
