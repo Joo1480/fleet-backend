@@ -7,12 +7,15 @@ import { useState } from "react";
 import { MachinePagination } from "./machine-pagination";
 import { MachineModal } from "./machine-modal";
 import { MachineForm } from "./machine-form";
+import { Machine } from "../types/machine";
+
 
 export function MachineList() {
     const [page, setPage] = useState(1);
     const [type, setType] = useState("");
     const [search, setSearch] = useState("");
     const [openModal, setOpenModal] = useState(false);
+    const [selectedMachine, setSelectedMachine] = useState<Machine | undefined>();
 
     const { data, isPending, error } = useMachines({
         page,
@@ -20,6 +23,11 @@ export function MachineList() {
         type,
         search
     });
+
+    const handleEdit = (machine: Machine) => {
+      setSelectedMachine(machine);
+      setOpenModal(true);
+    };
 
   if (isPending && !data) {
     return <p>Carregando...</p>;
@@ -54,16 +62,35 @@ export function MachineList() {
           onCreate={() => setOpenModal(true)}
         />
 
-        <MachineTable machines={data.data} />
+        <MachineTable
+          machines={data.data}
+          onEdit={handleEdit}
+          onDelete={() => {}}
+        />
         <MachineModal
           open={openModal}
-          title="Nova máquina"
-          description="Preencha os dados da máquina. Validação espelhada no backend (Zod)."
-          onClose={() => setOpenModal(false)}
+          title={
+            selectedMachine
+              ? "Editar máquina"
+              : "Nova máquina"
+          }
+          description={
+            selectedMachine
+              ? "Altere os dados da máquina."
+              : "Preencha os dados da máquina."
+          }
+          onClose={() => {
+            setOpenModal(false);
+            setSelectedMachine(undefined);
+          }}
         >
           <MachineForm
-            onCancel={() => setOpenModal(false)}
-          />
+          machine={selectedMachine}
+          onCancel={() => {
+            setOpenModal(false);
+            setSelectedMachine(undefined);
+          }}
+        />
         </MachineModal>
         
         <MachinePagination

@@ -6,10 +6,14 @@ import { getMachineTypeLabel } from "../utils/machine-type";
 
 type MachineTableProps = {
   machines: Machine[];
+  onEdit: (machine: Machine) => void;
+  onDelete: (machine: Machine) => void;
 };
 
 export function MachineTable({
   machines,
+  onEdit,
+  onDelete,
 }: MachineTableProps) {
   return (
     <div className="overflow-x-auto">
@@ -41,6 +45,7 @@ export function MachineTable({
               <td className="px-4 py-3">
                     <div className="flex justify-end gap-2">
                         <button
+                        onClick={() => onEdit(machine)}
                         className="rounded-md p-2 text-gray-500 transition hover:bg-gray-100 hover:text-black"
                         title="Editar"
                         >
@@ -48,6 +53,7 @@ export function MachineTable({
                         </button>
 
                         <button
+                        onClick={() => onDelete(machine)}
                         className="rounded-md p-2 text-red-500 transition hover:bg-red-50"
                         title="Excluir"
                         >

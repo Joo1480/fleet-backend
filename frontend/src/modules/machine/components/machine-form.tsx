@@ -11,6 +11,7 @@ import {
 } from "../schemas/machine.schema";
 
 import { useCreateMachine } from "../hooks/use-create-machine";
+import { useUpdateMachine } from "../hooks/use-update-machine";
 import { Machine } from "../types/machine";
 
 type MachineFormProps = {
@@ -55,9 +56,24 @@ export function MachineForm({
             onCancel();
         },
     });
+    const updateMachine = useUpdateMachine({
+      onSuccess: () => {
+        reset();
+        onCancel();
+      },
+    });
 
     const onSubmit = (data: CreateMachineFormData) => {
-        createMachine.mutate(data);
+      if (machine) {
+        updateMachine.mutate({
+          code: machine.code,
+          machine: data,
+        });
+
+        return;
+      }
+
+      createMachine.mutate(data);
     };
 
   return (
@@ -74,7 +90,12 @@ export function MachineForm({
         <input
           type="number"
           {...register("code")}
+          disabled={!!machine}
           className={`h-11 w-full rounded-lg border px-3 ${
+            machine
+              ? "cursor-not-allowed bg-gray-100 text-gray-500"
+              : ""
+          } ${
             errors.code ? "border-red-500" : "border-gray-300"
           }`}
         />
@@ -215,11 +236,18 @@ export function MachineForm({
         </button>
 
         <button
-        type="submit"
-        disabled={createMachine.isPending}
-        className="rounded-lg bg-black px-5 py-2 text-white disabled:cursor-not-allowed disabled:opacity-50"
+          type="submit"
+          disabled={
+            createMachine.isPending ||
+            updateMachine.isPending
+          }
+          className="rounded-lg bg-black px-5 py-2 text-white disabled:cursor-not-allowed disabled:opacity-50"
         >
-        {createMachine.isPending ? "Salvando..." : "Salvar"}
+          {createMachine.isPending || updateMachine.isPending
+            ? "Salvando..."
+            : machine
+              ? "Salvar alterações"
+              : "Salvar"}
         </button>
       </div>
     </form>
