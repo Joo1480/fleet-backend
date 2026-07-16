@@ -8,6 +8,7 @@ import { MachinePagination } from "./machine-pagination";
 import { MachineModal } from "./machine-modal";
 import { MachineForm } from "./machine-form";
 import { Machine } from "../types/machine";
+import { useDeleteMachine } from "../hooks/use-delete-machine";
 
 
 export function MachineList() {
@@ -24,9 +25,20 @@ export function MachineList() {
         search
     });
 
+    const deleteMachine = useDeleteMachine();
+
     const handleEdit = (machine: Machine) => {
       setSelectedMachine(machine);
       setOpenModal(true);
+    };
+    const handleDelete = (machine: Machine) => {
+      const confirmed = window.confirm(
+        `Deseja excluir a máquina ${machine.code}?`
+      );
+      if (!confirmed) {
+        return;
+      }
+      deleteMachine.mutate(machine.code);
     };
 
   if (isPending && !data) {
@@ -65,7 +77,7 @@ export function MachineList() {
         <MachineTable
           machines={data.data}
           onEdit={handleEdit}
-          onDelete={() => {}}
+          onDelete={handleDelete}
         />
         <MachineModal
           open={openModal}
