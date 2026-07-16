@@ -92,3 +92,14 @@ export async function updateMachine(
     },
   });
 }
+
+export async function deleteMachine(code: string) {
+  return prisma.machine.update({
+    where: {
+      code,
+    },
+    data: {
+      deletedAt: new Date(),
+    },
+  });
+}

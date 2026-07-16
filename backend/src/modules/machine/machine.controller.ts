@@ -10,6 +10,7 @@ import {
   createMachine as createMachineService,
   getMachines,
   updateMachine as updateMachineService,
+  deleteMachine as deleteMachineService,
 } from "./machine.service";
 
 export async function listMachines(
@@ -48,4 +49,15 @@ export async function updateMachine(
   );
 
   return response.json(updatedMachine);
+}
+
+export async function deleteMachine(
+  request: Request,
+  response: Response,
+) {
+  const { code } = request.params;
+
+  await deleteMachineService(code);
+
+  return response.status(204).send();
 }

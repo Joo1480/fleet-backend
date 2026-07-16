@@ -2,6 +2,7 @@ import {
   createMachine as createMachineRepository,
   findMachines,
   updateMachine as updateMachineRepository,
+  deleteMachine as deleteMachineRepository,
 } from "./machine.repository";
 
 import { toMachineDto } from "./machine.mapper";
@@ -44,4 +45,8 @@ export async function updateMachine(
   );
 
   return toMachineDto(updatedMachine);
+}
+
+export async function deleteMachine(code: string) {
+  await deleteMachineRepository(code);
 }
