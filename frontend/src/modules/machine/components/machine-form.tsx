@@ -1,14 +1,37 @@
 "use client";
 
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
 import { MACHINE_TYPES } from "../utils/machine-type";
+import {
+  createMachineSchema,
+  CreateMachineFormData,
+} from "../schemas/machine.schema";
 
 type MachineFormProps = {
   onCancel: () => void;
 };
 
 export function MachineForm({ onCancel }: MachineFormProps) {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<CreateMachineFormData>({
+    resolver: zodResolver(createMachineSchema),
+  });
+
+  const onSubmit = (data: CreateMachineFormData) => {
+    console.log(data);
+  };
+
   return (
-    <form className="space-y-5">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="space-y-5"
+    >
+      {/* Código */}
       <div>
         <label className="mb-2 block text-sm font-medium">
           Código *
@@ -16,10 +39,20 @@ export function MachineForm({ onCancel }: MachineFormProps) {
 
         <input
           type="text"
-          className="h-11 w-full rounded-lg border border-gray-300 px-3"
+          {...register("code")}
+          className={`h-11 w-full rounded-lg border px-3 ${
+            errors.code ? "border-red-500" : "border-gray-300"
+          }`}
         />
+
+        {errors.code && (
+          <p className="mt-1 text-sm text-red-500">
+            {errors.code.message}
+          </p>
+        )}
       </div>
 
+      {/* Nome */}
       <div>
         <label className="mb-2 block text-sm font-medium">
           Nome *
@@ -28,26 +61,46 @@ export function MachineForm({ onCancel }: MachineFormProps) {
         <input
           type="text"
           placeholder="Ex.: Colhedora 6005"
-          className="h-11 w-full rounded-lg border border-gray-300 px-3"
+          {...register("name")}
+          className={`h-11 w-full rounded-lg border px-3 ${
+            errors.name ? "border-red-500" : "border-gray-300"
+          }`}
         />
+
+        {errors.name && (
+          <p className="mt-1 text-sm text-red-500">
+            {errors.name.message}
+          </p>
+        )}
       </div>
 
+      {/* Tipo / Ano */}
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="mb-2 block text-sm font-medium">
             Tipo *
           </label>
 
-          <select className="h-11 w-full rounded-lg border border-gray-300 px-3">
+          <select
+            {...register("type")}
+            className={`h-11 w-full rounded-lg border px-3 ${
+              errors.type ? "border-red-500" : "border-gray-300"
+            }`}
+          >
+            <option value="">Selecione</option>
+
             {MACHINE_TYPES.map((type) => (
-              <option
-                key={type.value}
-                value={type.value}
-              >
+              <option key={type.value} value={type.value}>
                 {type.label}
               </option>
             ))}
           </select>
+
+          {errors.type && (
+            <p className="mt-1 text-sm text-red-500">
+              {errors.type.message}
+            </p>
+          )}
         </div>
 
         <div>
@@ -58,11 +111,21 @@ export function MachineForm({ onCancel }: MachineFormProps) {
           <input
             type="number"
             placeholder="2024"
-            className="h-11 w-full rounded-lg border border-gray-300 px-3"
+            {...register("year")}
+            className={`h-11 w-full rounded-lg border px-3 ${
+              errors.year ? "border-red-500" : "border-gray-300"
+            }`}
           />
+
+          {errors.year && (
+            <p className="mt-1 text-sm text-red-500">
+              {errors.year.message}
+            </p>
+          )}
         </div>
       </div>
 
+      {/* Modelo / Marca */}
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="mb-2 block text-sm font-medium">
@@ -72,8 +135,17 @@ export function MachineForm({ onCancel }: MachineFormProps) {
           <input
             type="text"
             placeholder="Ex.: CH570"
-            className="h-11 w-full rounded-lg border border-gray-300 px-3"
+            {...register("model")}
+            className={`h-11 w-full rounded-lg border px-3 ${
+              errors.model ? "border-red-500" : "border-gray-300"
+            }`}
           />
+
+          {errors.model && (
+            <p className="mt-1 text-sm text-red-500">
+              {errors.model.message}
+            </p>
+          )}
         </div>
 
         <div>
@@ -84,11 +156,21 @@ export function MachineForm({ onCancel }: MachineFormProps) {
           <input
             type="text"
             placeholder="Ex.: John Deere"
-            className="h-11 w-full rounded-lg border border-gray-300 px-3"
+            {...register("brand")}
+            className={`h-11 w-full rounded-lg border px-3 ${
+              errors.brand ? "border-red-500" : "border-gray-300"
+            }`}
           />
+
+          {errors.brand && (
+            <p className="mt-1 text-sm text-red-500">
+              {errors.brand.message}
+            </p>
+          )}
         </div>
       </div>
 
+      {/* Botões */}
       <div className="flex justify-end gap-3 pt-2">
         <button
           type="button"
