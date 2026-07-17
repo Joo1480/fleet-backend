@@ -1,5 +1,11 @@
 import { EventGroup } from "@prisma/client";
 import { findSummaryData } from "./summary.repository";
+import {
+  SummaryDto,
+  ChartSummaryDto,
+  FleetSummaryDto,
+  MachineSummaryDto,
+} from "./summary.dto";
 
 const MILLISECONDS_PER_HOUR = 1000 * 60 * 60;
 
@@ -20,7 +26,10 @@ function calculateEventHours(
 
 function groupEventsByMachine(
   events: Awaited<ReturnType<typeof findSummaryData>>,
-) {
+): Map<
+  string,
+  Awaited<ReturnType<typeof findSummaryData>>
+> {
   const groupedEvents = new Map<
     string,
     Awaited<ReturnType<typeof findSummaryData>>
@@ -44,7 +53,7 @@ function groupEventsByMachine(
 
 function calculateMachineSummary(
   events: Awaited<ReturnType<typeof findSummaryData>>,
-) {
+): MachineSummaryDto {
   const machine = events[0].machine;
 
   let effectiveHours = 0;
@@ -135,16 +144,138 @@ function calculateMachineSummary(
   };
 }
 
+function calculateFleetSummary(
+  machines: MachineSummaryDto[],
+): FleetSummaryDto {
+  const activeMachines = machines.length;
+
+  const totalHours = Number(
+    machines
+      .reduce(
+        (total, machine) => total + machine.totalHours,
+        0,
+      )
+      .toFixed(2),
+  );
+
+  const averageAvailability =
+    activeMachines === 0
+      ? 0
+      : Number(
+          (
+            machines.reduce(
+              (total, machine) =>
+                total + machine.availability,
+              0,
+            ) / activeMachines
+          ).toFixed(2),
+        );
+
+  const averageEfficiency =
+    activeMachines === 0
+      ? 0
+      : Number(
+          (
+            machines.reduce(
+              (total, machine) =>
+                total + machine.efficiency,
+              0,
+            ) / activeMachines
+          ).toFixed(2),
+        );
+
+  return {
+    activeMachines,
+    totalHours,
+    averageAvailability,
+    averageEfficiency,
+  };
+}
+
+function calculateChartData(
+  events: Awaited<ReturnType<typeof findSummaryData>>,
+): ChartSummaryDto[] {
+  const chartData = new Map<string, ChartSummaryDto>();
+
+  for (const event of events) {
+    const date = event.startTime
+      .toISOString()
+      .split("T")[0];
+
+    if (!chartData.has(date)) {
+      chartData.set(date, {
+        date,
+        effectiveHours: 0,
+        maneuverHours: 0,
+        displacementHours: 0,
+        waitingHours: 0,
+        maintenanceHours: 0,
+      });
+    }
+
+    const day = chartData.get(date);
+
+    if (!day) {
+    continue;
+    }
+
+    const hours = calculateEventHours(
+      event.startTime,
+      event.endTime,
+    );
+
+    switch (event.eventGroup) {
+      case EventGroup.EFETIVO:
+        day.effectiveHours += hours;
+        break;
+
+      case EventGroup.MANOBRA:
+        day.maneuverHours += hours;
+        break;
+
+      case EventGroup.DESLOCAMENTO:
+        day.displacementHours += hours;
+        break;
+
+      case EventGroup.AGUARDANDO:
+        day.waitingHours += hours;
+        break;
+
+      case EventGroup.MANUTENCAO:
+        day.maintenanceHours += hours;
+        break;
+    }
+  }
+
+  return [...chartData.values()].map((day) => ({
+    ...day,
+    effectiveHours: Number(day.effectiveHours.toFixed(2)),
+    maneuverHours: Number(day.maneuverHours.toFixed(2)),
+    displacementHours: Number(day.displacementHours.toFixed(2)),
+    waitingHours: Number(day.waitingHours.toFixed(2)),
+    maintenanceHours: Number(day.maintenanceHours.toFixed(2)),
+  }));
+}
 
 export async function getSummary(
   from: Date,
   to: Date,
-) {
+): Promise<SummaryDto> {
   const events = await findSummaryData(from, to);
 
   const groupedEvents = groupEventsByMachine(events);
 
-  return [...groupedEvents.values()].map(
-    calculateMachineSummary,
-  );
+  const machines = [...groupedEvents.values()].map(calculateMachineSummary);
+
+  machines.sort((a, b) => a.code.localeCompare(b.code));
+
+  const summary = calculateFleetSummary(machines,);
+  const chart = calculateChartData(events);
+  chart.sort((a, b) => a.date.localeCompare(b.date));
+
+    return {
+    summary,
+    machines,
+    chart,
+    };
 }
