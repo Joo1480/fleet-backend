@@ -23,9 +23,23 @@ export default function Dashboard() {
 
   return (
   <>
-    <SummaryCards summary={data.summary} />
-    <SummaryTable machines={data.machines} />
-    <SummaryChart chart={data.chart} />
-  </>
+  <div className="flex items-center justify-between">
+    <div>
+      <h1><strong>Dashboard da frota</strong></h1>
+      <p>Indicadores do período selecionado</p>
+    </div>
+
+    {/* Por enquanto pode ser um select estático */}
+    <select>
+      <option>01/06/2026 – 07/06/2026</option>
+    </select>
+  </div>
+
+  <SummaryCards summary={data.summary} />
+
+  <SummaryChart chart={data.chart} />
+
+  <SummaryTable machines={data.machines} />
+</>
 );
 }
