@@ -1,7 +1,5 @@
 import events from "../data/events.json";
 
-import { EventGroup } from "@prisma/client";
-
 import { prisma } from "../src/shared/prisma/client";
 
 import { EVENT_GROUP_MAP } from "../src/shared/utils/event-group-map";
@@ -21,51 +19,79 @@ export async function seedEvents() {
     machines.map((machine) => machine.code),
   );
 
-  const eventData = eventList
-    .map((event) => {
-      const eventGroup = EVENT_GROUP_MAP[event.eventGroup];
+  let imported = 0;
+  let skipped = 0;
 
-      const startTime = new Date(event.startTime);
-      const endTime = event.endTime
-        ? new Date(event.endTime)
-        : null;
+  for (const event of eventList) {
+    const eventGroup = EVENT_GROUP_MAP[event.eventGroup];
 
-      if (!machineCodes.has(event.machineCode)) {
+    const startTime = new Date(event.startTime);
+    const endTime = event.endTime
+      ? new Date(event.endTime)
+      : null;
+
+    if (!machineCodes.has(event.machineCode)) {
+      console.warn(
+        `Skipping event ${event.id}: machine ${event.machineCode} not found.`,
+      );
+      skipped++;
+      continue;
+    }
+
+    if (!eventGroup) {
+      console.warn(
+        `Skipping event ${event.id}: invalid event group ${event.eventGroup}.`,
+      );
+      skipped++;
+      continue;
+    }
+
+    if (endTime && startTime > endTime) {
+      console.warn(
+        `Skipping event ${event.id}: startTime is after endTime.`,
+      );
+      skipped++;
+      continue;
+    }
+
+    try {
+      const existingEvent = await prisma.event.findUnique({
+        where: {
+          id: event.id,
+        },
+      });
+
+      if (existingEvent) {
         console.warn(
-          `Skipping event ${event.id}: machine ${event.machineCode} not found.`,
+          `Skipping event ${event.id}: duplicate event.`,
         );
-        return null;
+
+        skipped++;
+        continue;
       }
 
-      if (!eventGroup) {
-        console.warn(
-          `Skipping event ${event.id}: invalid event group ${event.eventGroup}.`,
-        );
-        return null;
-      }
+      await prisma.event.create({
+        data: {
+          id: event.id,
+          machineCode: event.machineCode,
+          eventGroup,
+          startTime,
+          endTime,
+        },
+      });
 
-      if (endTime && startTime > endTime) {
-        console.warn(
-          `Skipping event ${event.id}: startTime is after endTime.`,
-        );
-        return null;
-      }
+      imported++;
+    } catch (error) {
+      console.warn(
+        `Skipping event ${event.id}: ${
+          error instanceof Error ? error.message : error
+        }`,
+      );
 
-      return {
-        id: event.id,
-        machineCode : event.machineCode,
-        eventGroup,
-        startTime,
-        endTime,
-      };
-    })
-    .filter(
-      (event): event is NonNullable<typeof event> => event !== null,
-    );
+      skipped++;
+    }
+  }
 
-  await prisma.event.createMany({
-    data: eventData,
-  });
-
-  console.log(`✅ ${eventData.length} events imported.`);
+  console.log(`✅ ${imported} events imported.`);
+  console.log(`⚠️ ${skipped} events skipped.`);
 }

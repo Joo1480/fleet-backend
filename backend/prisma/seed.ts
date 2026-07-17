@@ -12,7 +12,7 @@ export async function main() {
 
   await clearDatabase();
   await seedMachines();
-  // await seedEvents();
+  await seedEvents();
 
   console.log("✅ Database seeded successfully.");
 }
