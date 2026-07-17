@@ -2,7 +2,7 @@
 
 Aplicação desenvolvida para o desafio técnico de monitoramento de máquinas, composta por uma API REST, uma interface web e um banco de dados PostgreSQL.
 
-O objetivo é gerenciar o cadastro de máquinas, importar eventos operacionais e apresentar indicadores por meio de uma dashboard.
+O sistema permite gerenciar máquinas, importar eventos operacionais e acompanhar indicadores através de uma dashboard.
 
 ---
 
@@ -25,6 +25,8 @@ O objetivo é gerenciar o cadastro de máquinas, importar eventos operacionais e
 - TanStack Query
 - React Hook Form
 - Zod
+- Recharts
+- shadcn/ui
 
 ## Infraestrutura
 
@@ -51,23 +53,23 @@ Prisma
 PostgreSQL
 ```
 
-Cada camada possui uma responsabilidade específica:
+Responsabilidades:
 
-- **Controller**: recebe as requisições HTTP.
+- **Controller**: recebe e valida as requisições HTTP.
 - **Service**: contém as regras de negócio.
-- **Repository**: responsável pelo acesso aos dados.
-- **Prisma**: comunicação com o banco de dados.
+- **Repository**: realiza o acesso aos dados.
+- **Prisma**: comunicação com o banco PostgreSQL.
 
 ---
 
 ## Frontend
 
-O frontend foi desenvolvido utilizando Next.js com componentes reutilizáveis e separação entre páginas, serviços e hooks.
-
-Estrutura simplificada:
+O frontend foi organizado por módulos para facilitar manutenção e escalabilidade.
 
 ```
 Pages
+    ↓
+Modules
     ↓
 Components
     ↓
@@ -77,6 +79,8 @@ Services
     ↓
 API
 ```
+
+Cada módulo concentra seus próprios componentes, hooks, serviços, tipos e utilitários.
 
 ---
 
@@ -93,11 +97,11 @@ API
 docker compose up --build
 ```
 
-Ao iniciar o ambiente, são executados automaticamente:
+Durante a inicialização são executados automaticamente:
 
-- criação do banco de dados;
+- criação do banco;
 - migrations do Prisma;
-- seed das tabelas;
+- seed dos dados;
 - inicialização da API;
 - inicialização do Frontend.
 
@@ -133,49 +137,49 @@ http://localhost:3000
 
 ## Eventos
 
-- Importação via Seed
-- Relacionamento com máquinas através do `machineCode`
-- Validação dos dados durante a importação
+- Importação automática via Seed
+- Relacionamento utilizando o `machineCode`
+- Validação durante a importação
+- Tratamento de inconsistências
 
 ## Dashboard
 
-🚧 Em desenvolvimento.
+- Cards com indicadores consolidados
+- Gráfico de horas por grupo de evento
+- Indicadores por máquina
+- Disponibilidade operacional
+- Eficiência operacional
+- Consulta por período
 
 ---
 
 # Tratamento dos dados
 
-O arquivo `events.json` contém dados propositalmente inconsistentes. Durante a importação foi adotada a seguinte estratégia.
+O arquivo `events.json` contém dados propositalmente inconsistentes.
+
+Durante a importação foi adotada a seguinte estratégia.
 
 ## Eventos em aberto
 
-Eventos com `endTime = null` são considerados eventos ainda em andamento e são importados normalmente.
-
----
+Eventos com `endTime = null` são considerados eventos em andamento e permanecem válidos.
 
 ## Máquina inexistente
 
 Eventos cujo `machineCode` não existe no cadastro de máquinas são ignorados.
 
----
-
 ## Horário inválido
 
-Eventos cujo `startTime` seja maior que `endTime` são considerados inválidos e são ignorados.
-
----
+Eventos cujo `startTime` seja maior que `endTime` são considerados inválidos.
 
 ## Eventos duplicados
 
-Eventos com o mesmo identificador (`id`) são ignorados durante a importação.
-
----
+Eventos com o mesmo identificador (`id`) são ignorados.
 
 ## Eventos sobrepostos
 
-Eventos sobrepostos foram mantidos.
+Os eventos sobrepostos foram preservados.
 
-Como o desafio não define uma regra de prioridade entre estados concorrentes, optou-se por preservar os dados originais e evitar decisões de negócio não especificadas.
+Como o desafio não define regras de prioridade entre estados concorrentes, optou-se por manter os dados originais sem aplicar regras de negócio arbitrárias.
 
 ---
 
@@ -183,11 +187,16 @@ Como o desafio não define uma regra de prioridade entre estados concorrentes, o
 
 Durante o desenvolvimento foram adotadas as seguintes decisões:
 
-- Utilização do `machineCode` como chave de relacionamento dos eventos, por representar o identificador de negócio da máquina.
-- Exclusão lógica (`Soft Delete`) para preservar o histórico de máquinas.
-- Utilização do Repository Pattern para desacoplamento do acesso aos dados.
-- Docker Compose para facilitar a configuração do ambiente.
-- Execução automática de migrations e seed durante a inicialização do projeto.
+- Utilização do `machineCode` como identificador de negócio.
+- Exclusão lógica (Soft Delete) para preservar histórico.
+- Repository Pattern para desacoplamento da persistência.
+- Organização do frontend em módulos.
+- React Query para gerenciamento das consultas.
+- Recharts para visualização dos indicadores.
+- Componentes reutilizáveis utilizando shadcn/ui.
+- Datas armazenadas em UTC no backend e apresentadas no fuso `America/Sao_Paulo` no frontend.
+- Docker Compose para padronização do ambiente.
+- Execução automática de migrations e seed durante a inicialização.
 
 ---
 
@@ -210,23 +219,16 @@ frontend/
 │
 ├── app/
 ├── components/
-├── hooks/
-├── services/
-├── types/
-└── utils/
+│   └── ui/
+├── modules/
+│   └── dashboard/
+│       ├── components/
+│       ├── hooks/
+│       ├── services/
+│       ├── types/
+│       └── utils/
+└── lib/
 ```
-
----
-
-# Melhorias futuras
-
-- Dashboard operacional
-- Indicadores de disponibilidade
-- Gráficos
-- Testes automatizados
-- Logs estruturados
-- Monitoramento
-- Cache de consultas
 
 ---
 
