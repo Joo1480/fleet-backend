@@ -1,17 +1,28 @@
 "use client";
-import { useSummary } from "./hooks/use-summary";
-import { SummaryCards } from "./components/summary-cards";
-import { SummaryTable } from "./components/summary-table";
-import { SummaryChart } from "./components/summary-chart";
 
-const DEFAULT_FROM = "2026-06-01T00:00:00.000Z";
-const DEFAULT_TO = "2026-06-07T23:59:59.999Z";
+import { useState } from "react";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+
+import { SummaryCards } from "./components/summary-cards";
+import { SummaryChart } from "./components/summary-chart";
+import { SummaryTable } from "./components/summary-table";
+import { useSummary } from "./hooks/use-summary";
+
+const DEFAULT_FROM = "2026-06-01";
+const DEFAULT_TO = "2026-06-07";
 
 export default function Dashboard() {
-  const { data, isLoading, isError } = useSummary({
-    from: DEFAULT_FROM,
-    to: DEFAULT_TO,
+  const [from, setFrom] = useState(DEFAULT_FROM);
+  const [to, setTo] = useState(DEFAULT_TO);
+
+  const [filters, setFilters] = useState({
+    from: `${DEFAULT_FROM}T00:00:00.000Z`,
+    to: `${DEFAULT_TO}T23:59:59.999Z`,
   });
+
+  const { data, isLoading, isError } = useSummary(filters);
 
   if (isLoading) {
     return <p>Loading...</p>;
@@ -21,25 +32,60 @@ export default function Dashboard() {
     return <p>Error loading dashboard.</p>;
   }
 
+  function handleApplyFilters() {
+    setFilters({
+      from: `${from}T00:00:00.000Z`,
+      to: `${to}T23:59:59.999Z`,
+    });
+  }
+
   return (
-  <>
-  <div className="flex items-center justify-between">
-    <div>
-      <h1><strong>Dashboard da frota</strong></h1>
-      <p>Indicadores do período selecionado</p>
-    </div>
+    <>
+      <div className="mb-6 flex items-end justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">Dashboard da frota</h1>
 
-    {/* Por enquanto pode ser um select estático */}
-    <select>
-      <option>01/06/2026 – 07/06/2026</option>
-    </select>
-  </div>
+          <p className="text-sm text-muted-foreground">
+            Indicadores do período selecionado
+          </p>
+        </div>
 
-  <SummaryCards summary={data.summary} />
+        <div className="flex items-end gap-3">
+          <div>
+            <label className="mb-1 block text-sm font-medium">
+              From
+            </label>
 
-  <SummaryChart chart={data.chart} />
+            <Input
+              type="date"
+              value={from}
+              onChange={(event) => setFrom(event.target.value)}
+            />
+          </div>
 
-  <SummaryTable machines={data.machines} />
-</>
-);
+          <div>
+            <label className="mb-1 block text-sm font-medium">
+              To
+            </label>
+
+            <Input
+              type="date"
+              value={to}
+              onChange={(event) => setTo(event.target.value)}
+            />
+          </div>
+
+          <Button onClick={handleApplyFilters}>
+            Apply
+          </Button>
+        </div>
+      </div>
+
+      <SummaryCards summary={data.summary} />
+
+      <SummaryChart chart={data.chart} />
+
+      <SummaryTable machines={data.machines} />
+    </>
+  );
 }
