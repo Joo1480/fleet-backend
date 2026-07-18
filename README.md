@@ -161,7 +161,7 @@ Durante a importação foi adotada a seguinte estratégia.
 
 ## Eventos em aberto
 
-Eventos com `endTime = null` são considerados eventos em andamento e permanecem válidos.
+- Eventos em aberto (`endTime = null`) não contabilizam horas.
 
 ## Máquina inexistente
 
@@ -231,6 +231,25 @@ frontend/
 ```
 
 ---
+
+# Testes
+
+Os testes unitários foram implementados utilizando **Vitest**, cobrindo as principais regras de negócio responsáveis pelo cálculo dos indicadores da dashboard.
+
+Atualmente são testados:
+
+- Cálculo da duração dos eventos
+- Tratamento de eventos em aberto (`endTime = null`)
+- Tratamento de horários inválidos (`endTime < startTime`)
+- Cálculo dos indicadores por máquina
+- Cálculo dos indicadores da frota
+- Agrupamento dos dados para o gráfico
+
+Para executar os testes:
+
+```bash
+npm test
+```
 
 # Autor
 
