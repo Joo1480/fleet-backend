@@ -9,13 +9,13 @@ import {
 
 const MILLISECONDS_PER_HOUR = 1000 * 60 * 60;
 
-function calculateEventHours(
+export function calculateEventHours(
   startTime: Date,
   endTime: Date | null,
 ): number {
-  if (!endTime) {
+  if (!endTime || endTime < startTime) {
     return 0;
-  }
+}
 
   const milliseconds = endTime.getTime() - startTime.getTime();
 
@@ -24,7 +24,7 @@ function calculateEventHours(
   return Number(hours.toFixed(2));
 }
 
-function groupEventsByMachine(
+export function groupEventsByMachine(
   events: Awaited<ReturnType<typeof findSummaryData>>,
 ): Map<
   string,
@@ -51,7 +51,7 @@ function groupEventsByMachine(
   return groupedEvents;
 }
 
-function calculateMachineSummary(
+export function calculateMachineSummary(
   events: Awaited<ReturnType<typeof findSummaryData>>,
 ): MachineSummaryDto {
   const machine = events[0].machine;
@@ -144,7 +144,7 @@ function calculateMachineSummary(
   };
 }
 
-function calculateFleetSummary(
+export function calculateFleetSummary(
   machines: MachineSummaryDto[],
 ): FleetSummaryDto {
   const activeMachines = machines.length;
@@ -192,7 +192,7 @@ function calculateFleetSummary(
   };
 }
 
-function calculateChartData(
+export function calculateChartData(
   events: Awaited<ReturnType<typeof findSummaryData>>,
 ): ChartSummaryDto[] {
   const chartData = new Map<string, ChartSummaryDto>();
