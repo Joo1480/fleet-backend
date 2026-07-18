@@ -173,7 +173,7 @@ Eventos cujo `startTime` seja maior que `endTime` são considerados inválidos.
 
 ## Eventos duplicados
 
-Eventos com o mesmo identificador (`id`) são ignorados.
+Eventos com o mesmo identificador (`id`) será validado o primeiro que vier na lista no momento do cadastro.
 
 ## Eventos sobrepostos
 
